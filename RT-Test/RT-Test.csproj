@@ -138,6 +138,8 @@
   <ItemGroup>
     <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\botone.resoone.com - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\resobotone - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\resobotone - Web Deploy.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
