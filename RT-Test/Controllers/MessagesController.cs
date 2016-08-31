@@ -20,48 +20,9 @@ namespace RT_Test
         /// </summary>
         public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
         {
+            ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
             if (activity.Type == ActivityTypes.Message)
             {
-                string err = "", tconv = "";
-                try
-                {
-                    var tuser = new ChannelAccount(name: "", id: "@255348756");
-                    var suser = new ChannelAccount(name: "", id: "@29:1t9q0pbwa_jOKKqwQgQZLfbzjY09mHBxIbjlYE0n299E");
-
-                    var sbotAccount = new ChannelAccount(name: "258", id: @"28:13761c30-c534-4f37-b534-a75ea659ff17");
-                    var tbotAccount = new ChannelAccount(name: "258", id: "rttestbot");
-
-                    ConnectorClient connectorTelegramm = new ConnectorClient(new Uri("https://telegram.botframework.com/"));
-                    ConnectorClient connectorSkype = new ConnectorClient(new Uri("https://skype.botframework.com"));
-
-                    var tconversationId = new ResourceResponse("255348756");//await connectorSkype.Conversations.CreateDirectConversationAsync(tbotAccount, tuser); 
-                    tconv = tconversationId.Id.TrimStart('@');
-                    var sconversationId = new ResourceResponse("29:1t9q0pbwa_jOKKqwQgQZLfbzjY09mHBxIbjlYE0n299E");
-                    tconv = tconversationId.Id;
-
-                    IMessageActivity tmessage = Activity.CreateMessageActivity();
-                    tmessage.From = tbotAccount;
-                    tmessage.Recipient = tuser;
-                    tmessage.Conversation = new ConversationAccount(id: tconv);
-                    tmessage.Text = "tele Hello";
-                    tmessage.Locale = "en-Us";
-
-                    IMessageActivity smessage = Activity.CreateMessageActivity();
-                    smessage.From = sbotAccount;
-                    smessage.Recipient = suser;
-                    smessage.Conversation = new ConversationAccount(id: sconversationId.Id);
-                    smessage.Text = "skype Hello";
-                    smessage.Locale = "en-Us";
-
-                    await connectorTelegramm.Conversations.SendToConversationAsync((Activity)tmessage);
-                    await connectorSkype.Conversations.SendToConversationAsync((Activity)smessage);
-                }
-                catch(Exception ex)
-                {
-                    err = ex.Message;
-                }
-                ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-                
                 // calculate something for us to return
                 int length = (activity.Text ?? string.Empty).Length;
                 // return our reply to the user
@@ -72,15 +33,12 @@ namespace RT_Test
                     //reply.Text = "![duck](http://aka.ms/Fo983c)";
                 //}
                 reply.Text = JsonConvert.SerializeObject(activity);
-                reply.Text += " @@@ tconv = " + tconv + " @@@";
-                reply.Text += " ------------------------------------------" + err;
-
-
                 await connector.Conversations.ReplyToActivityAsync(reply);
             }
             else
             {
-                HandleSystemMessage(activity);
+                var a = HandleSystemMessage(activity);
+                if(a!=null) await connector.Conversations.ReplyToActivityAsync(a);
             }
             var response = Request.CreateResponse(HttpStatusCode.OK);
             return response;
@@ -107,7 +65,7 @@ namespace RT_Test
             }
             else if (message.Type == ActivityTypes.Typing)
             {
-                // Handle knowing tha the user is typing
+                return message.CreateReply("t t t t t");
             }
             else if (message.Type == ActivityTypes.Ping)
             {
