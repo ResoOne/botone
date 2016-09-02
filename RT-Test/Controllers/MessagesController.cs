@@ -20,9 +20,10 @@ namespace RT_Test
         /// </summary>
         public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
         {
+            
             ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-            if (activity.Type == ActivityTypes.Message)
-            {
+            //if (activity.Type == ActivityTypes.Message)
+            //{
                 // calculate something for us to return
                 int length = (activity.Text ?? string.Empty).Length;
                 // return our reply to the user
@@ -32,14 +33,14 @@ namespace RT_Test
                 //{
                     //reply.Text = "![duck](http://aka.ms/Fo983c)";
                 //}
-                reply.Text = JsonConvert.SerializeObject(activity);
+                reply.Text = JsonConvert.SerializeObject(activity) + " ----------- " + activity.Conversation.Id;
                 await connector.Conversations.ReplyToActivityAsync(reply);
-            }
-            else
-            {
-                var a = HandleSystemMessage(activity);
-                if(a!=null) await connector.Conversations.ReplyToActivityAsync(a);
-            }
+            //}
+            //else
+            //{
+                //var a = HandleSystemMessage(activity);
+                //if(a!=null) await connector.Conversations.ReplyToActivityAsync(a);
+            //}
             var response = Request.CreateResponse(HttpStatusCode.OK);
             return response;
             
